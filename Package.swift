@@ -13,6 +13,9 @@ let package = Package(
         .library(
             name: "youtube-ios-player-helper",
             targets: ["youtube-ios-player-helper"]),
+        .library(
+            name: "YoutubeSwiftUI",
+            targets: ["YoutubeSwiftUI"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -27,6 +30,11 @@ let package = Package(
             resources: [
                 .copy("YTPlayerView-iframe-player.html")
             ]),
+        
+        .target(
+            name: "YoutubeSwiftUI",
+            dependencies: ["youtube-ios-player-helper"]),
+        
         .testTarget(
             name: "youtube-ios-player-helperTests",
             dependencies: ["youtube-ios-player-helper"]),
