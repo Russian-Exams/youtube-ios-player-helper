@@ -1,11 +1,11 @@
     import XCTest
-    @testable import youtube_ios_player_helper
+    @testable import YoutubeUIKit
 
-    final class youtube_ios_player_helperTests: XCTestCase {
+    final class YoutubeUIKitTests: XCTestCase {
         func testExample() {
             // This is an example of a functional test case.
             // Use XCTAssert and related functions to verify your tests produce the correct
             // results.
-            XCTAssertEqual(youtube_ios_player_helper().text, "Hello, World!")
+            XCTAssertEqual(YoutubeUIKit().text, "Hello, World!")
         }
     }

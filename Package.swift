@@ -11,11 +11,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "youtube-ios-player-helper",
-            targets: ["youtube-ios-player-helper"]),
-        .library(
-            name: "YoutubeSwiftUI",
-            targets: ["YoutubeSwiftUI"]),
+            name: "YoutubeUIKit",
+            targets: ["YoutubeUIKit"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -25,18 +22,14 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "youtube-ios-player-helper",
+            name: "YoutubeUIKit",
             dependencies: [],
             resources: [
                 .copy("YTPlayerView-iframe-player.html")
-            ]),
-        
-        .target(
-            name: "YoutubeSwiftUI",
-            dependencies: ["youtube-ios-player-helper"]),
-        
+            ],
+            publicHeadersPath: "."),
         .testTarget(
-            name: "youtube-ios-player-helperTests",
-            dependencies: ["youtube-ios-player-helper"]),
+            name: "YoutubeUIKitTests",
+            dependencies: ["YoutubeUIKit"]),
     ]
 )
