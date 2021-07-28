@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "youtube-ios-player-helper",
+    name: "YoutubeIOSPlayerHelper",
     platforms: [
         .iOS(.v14)
     ],
