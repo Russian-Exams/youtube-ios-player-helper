@@ -1,5 +1,5 @@
     import XCTest
-    @testable import YoutubeUIKit
+    @testable import YoutubePlayerHelper
 
     final class YoutubeUIKitTests: XCTestCase {
         func testExample() {
