@@ -65,7 +65,7 @@ NSString static *const kYTPlayerSyndicationRegexPattern = @"^https://tpc.googles
 @interface YTPlayerView() <WKNavigationDelegate, WKUIDelegate>
 
 @property (nonatomic) NSURL *originURL;
-@property (nonatomic, weak) UIView *initialLoadingView;
+@property (nonatomic, weak) SystemView *initialLoadingView;
 
 @end
 
@@ -547,9 +547,7 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
    forNavigationAction:(WKNavigationAction *)navigationAction
         windowFeatures:(WKWindowFeatures *)windowFeatures {
   // Handle navigation actions initiated by Javascript.
-  [[UIApplication sharedApplication] openURL:navigationAction.request.URL
-                                     options:@{}
-                           completionHandler:nil];
+    [self openURL:navigationAction.request.URL];
   // Returning nil results in canceling the navigation, which has already been handled above.
   return nil;
 }
@@ -693,9 +691,7 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
   if (ytMatch || adMatch || oauthMatch || staticProxyMatch || syndicationMatch) {
     return YES;
   } else {
-    [[UIApplication sharedApplication] openURL:url
-                                       options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @NO}
-                             completionHandler:nil];
+      [self openURL:url universalLinkOnly:NO];
     return NO;
   }
 }
@@ -787,10 +783,14 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
   self.webView.UIDelegate = self;
 
   if ([self.delegate respondsToSelector:@selector(playerViewPreferredInitialLoadingView:)]) {
-    UIView *initialLoadingView = [self.delegate playerViewPreferredInitialLoadingView:self];
+    SystemView *initialLoadingView = [self.delegate playerViewPreferredInitialLoadingView:self];
     if (initialLoadingView) {
       initialLoadingView.frame = self.bounds;
-      initialLoadingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+#if TARGET_OS_IOS
+        initialLoadingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+#else
+        initialLoadingView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+#endif
       [self addSubview:initialLoadingView];
       self.initialLoadingView = initialLoadingView;
     }
@@ -907,20 +907,27 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
 
 - (WKWebView *)createNewWebView {
   WKWebViewConfiguration *webViewConfiguration = [[WKWebViewConfiguration alloc] init];
+#if TARGET_OS_IOS
   webViewConfiguration.allowsInlineMediaPlayback = YES;
+#endif
   webViewConfiguration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
   WKWebView *webView = [[WKWebView alloc] initWithFrame:self.bounds
                                           configuration:webViewConfiguration];
-  webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
-  webView.scrollView.scrollEnabled = NO;
-  webView.scrollView.bounces = NO;
+#if TARGET_OS_IOS
+    webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+    webView.scrollView.scrollEnabled = NO;
+    webView.scrollView.bounces = NO;
 
-  if ([self.delegate respondsToSelector:@selector(playerViewPreferredWebViewBackgroundColor:)]) {
-    webView.backgroundColor = [self.delegate playerViewPreferredWebViewBackgroundColor:self];
-    if (webView.backgroundColor == [UIColor clearColor]) {
-      webView.opaque = NO;
+    if ([self.delegate respondsToSelector:@selector(playerViewPreferredWebViewBackgroundColor:)]) {
+      webView.backgroundColor = [self.delegate playerViewPreferredWebViewBackgroundColor:self];
+      if (webView.backgroundColor == [SystemColor clearColor]) {
+        webView.opaque = NO;
+      }
     }
-  }
+#else
+    webView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+#endif
+ 
   return webView;
 }
 
@@ -939,5 +946,33 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
     });
     return frameworkBundle;
 }
+
+#pragma mark - Private
+- (void)openURL:(NSURL *)url {
+#if TARGET_OS_IOS
+    [[UIApplication sharedApplication] openURL:url
+                                       options:@{}
+                             completionHandler:nil];
+#else
+    [[NSWorkspace sharedWorkspace] openURL:url
+                            configuration:[NSWorkspaceOpenConfiguration configuration]
+                        completionHandler:nil];
+#endif
+}
+
+- (void)openURL:(NSURL *)url universalLinkOnly:(BOOL)universalLinkOnly {
+#if TARGET_OS_IOS
+    [[UIApplication sharedApplication] openURL:url
+                                       options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@(universalLinkOnly)}
+                             completionHandler:nil];
+#else
+    NSWorkspaceOpenConfiguration *const configuration = [NSWorkspaceOpenConfiguration configuration];
+    configuration.requiresUniversalLinks = universalLinkOnly;
+    [[NSWorkspace sharedWorkspace] openURL:url
+                            configuration:configuration
+                        completionHandler:nil];
+#endif
+}
+
 
 @end

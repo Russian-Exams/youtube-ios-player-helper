@@ -12,7 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if TARGET_OS_IOS
 #import <UIKit/UIKit.h>
+#define SystemView UIView
+#define SystemColor UIColor
+#else
+#import <AppKit/AppKit.h>
+#define SystemView NSView
+#define SystemColor NSColor
+#endif
+
 #import <WebKit/WebKit.h>
 
 @class YTPlayerView;
@@ -120,7 +129,7 @@ typedef void (^YTPlaybackQualityCompletionHandler)(YTPlaybackQuality result,
  * @param playerView The YTPlayerView instance where the error has occurred.
  * @return A color object that represents the background color of the webview.
  */
-- (nonnull UIColor *)playerViewPreferredWebViewBackgroundColor:(nonnull YTPlayerView *)playerView;
+- (nonnull SystemColor *)playerViewPreferredWebViewBackgroundColor:(nonnull YTPlayerView *)playerView;
 
 /**
  * Callback invoked when initially loading the YouTube iframe to the webview to display a custom
@@ -139,7 +148,7 @@ typedef void (^YTPlaybackQualityCompletionHandler)(YTPlaybackQuality result,
  * @return A view object that will be displayed while YouTube iframe API is being loaded. 
  *         Pass nil to display no custom loading view. Default implementation returns nil.
  */
-- (nullable UIView *)playerViewPreferredInitialLoadingView:(nonnull YTPlayerView *)playerView;
+- (nullable SystemView *)playerViewPreferredInitialLoadingView:(nonnull YTPlayerView *)playerView;
 
 @end
 
@@ -150,7 +159,7 @@ typedef void (^YTPlaybackQualityCompletionHandler)(YTPlaybackQuality result,
  * YTPlayerView::loadWithPlaylistId: or their variants to set the video or playlist
  * to populate the view with.
  */
-@interface YTPlayerView : UIView
+@interface YTPlayerView : SystemView
 
 @property(nonatomic, nullable, readonly) WKWebView *webView;
 
