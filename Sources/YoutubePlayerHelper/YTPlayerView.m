@@ -73,12 +73,19 @@ NSString static *const kYTPlayerSyndicationRegexPattern = @"^https://tpc.googles
 
 #pragma mark - View methods implementations
 
-- (CGSize)intrinsicContentSize {
+- (instancetype)initWithFrame:(CGRect)frame {
+    if(self = [super initWithFrame:frame]) {
 #if TARGET_OS_IOS
-    return (CGSize) { UIViewNoIntrinsicMetric, UIViewNoIntrinsicMetric };
+        _idealSize = (CGSize) { UIViewNoIntrinsicMetric, UIViewNoIntrinsicMetric };
 #else
-    return (CGSize) { NSViewNoInstrinsicMetric, NSViewNoInstrinsicMetric };
+        _idealSize = (CGSize) { NSViewNoIntrinsicMetric, NSViewNoIntrinsicMetric };
 #endif
+    }
+    return self;
+}
+
+- (CGSize)intrinsicContentSize {
+    return self.idealSize;
 }
 
 - (BOOL)loadWithVideoId:(NSString *)videoId {

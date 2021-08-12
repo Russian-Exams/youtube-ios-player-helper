@@ -163,6 +163,8 @@ typedef void (^YTPlaybackQualityCompletionHandler)(YTPlaybackQuality result,
  */
 @interface YTPlayerView : SystemView
 
+@property(assign, nonatomic) CGSize idealSize;
+
 @property(nonatomic, nullable, readonly) WKWebView *webView;
 
 /** A delegate to be notified on playback events. */
